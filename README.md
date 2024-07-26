@@ -1,4 +1,4 @@
-Infinitely scrolling feed with Next.js, Server Actions, Drizzle, and SWR
+# Infinitely scrolling feed with Next.js, Server Actions, Drizzle, and React Query
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 

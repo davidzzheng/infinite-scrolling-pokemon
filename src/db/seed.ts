@@ -1,20 +1,21 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import * as schema from "./schema";
+import Database from 'better-sqlite3'
+import { drizzle } from 'drizzle-orm/better-sqlite3'
+
+import * as schema from './schema'
 
 // Initialize the database
-const sqlite = new Database("pokemon.db");
-const db = drizzle(sqlite, { schema });
+const sqlite = new Database('pokemon.db')
+const db = drizzle(sqlite, { schema })
 
 async function fetchPokemonData(id: number) {
-	const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-	return await response.json();
+	const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+	return await response.json()
 }
 
 async function populateDatabase() {
 	for (let i = 1; i <= 151; i++) {
 		// Fetch first 151 Pokémon
-		const pokemonData = await fetchPokemonData(i);
+		const pokemonData = await fetchPokemonData(i)
 
 		// Insert Pokemon
 		await db.insert(schema.pokemon).values({
@@ -24,22 +25,22 @@ async function populateDatabase() {
 			weight: pokemonData.weight,
 			baseExperience: pokemonData.base_experience,
 			sprite: pokemonData.sprites.front_default,
-		});
+		})
 
 		// Insert Types
 		for (const typeData of pokemonData.types) {
 			await db
 				.insert(schema.types)
 				.values({
-					id: parseInt(typeData.type.url.split("/").slice(-2, -1)[0]),
+					id: parseInt(typeData.type.url.split('/').slice(-2, -1)[0]),
 					name: typeData.type.name,
 				})
-				.onConflictDoNothing();
+				.onConflictDoNothing()
 
 			await db.insert(schema.pokemonTypes).values({
 				pokemonId: pokemonData.id,
-				typeId: parseInt(typeData.type.url.split("/").slice(-2, -1)[0]),
-			});
+				typeId: parseInt(typeData.type.url.split('/').slice(-2, -1)[0]),
+			})
 		}
 
 		// Insert Abilities
@@ -47,23 +48,23 @@ async function populateDatabase() {
 			await db
 				.insert(schema.abilities)
 				.values({
-					id: parseInt(abilityData.ability.url.split("/").slice(-2, -1)[0]),
+					id: parseInt(abilityData.ability.url.split('/').slice(-2, -1)[0]),
 					name: abilityData.ability.name,
 				})
-				.onConflictDoNothing();
+				.onConflictDoNothing()
 
 			await db.insert(schema.pokemonAbilities).values({
 				pokemonId: pokemonData.id,
 				abilityId: parseInt(
-					abilityData.ability.url.split("/").slice(-2, -1)[0],
+					abilityData.ability.url.split('/').slice(-2, -1)[0],
 				),
-			});
+			})
 		}
 
 		// Insert Moves
 		for (const moveData of pokemonData.moves) {
-			const moveResponse = await fetch(moveData.move.url);
-			const moveDetails = await moveResponse.json();
+			const moveResponse = await fetch(moveData.move.url)
+			const moveDetails = await moveResponse.json()
 
 			await db
 				.insert(schema.moves)
@@ -74,16 +75,16 @@ async function populateDatabase() {
 					accuracy: moveDetails.accuracy,
 					pp: moveDetails.pp,
 				})
-				.onConflictDoNothing();
+				.onConflictDoNothing()
 
 			await db.insert(schema.pokemonMoves).values({
 				pokemonId: pokemonData.id,
 				moveId: moveDetails.id,
-			});
+			})
 		}
 
-		console.log(`Inserted data for ${pokemonData.name}`);
+		console.log(`Inserted data for ${pokemonData.name}`)
 	}
 }
 
-populateDatabase().then(() => console.log("Database population complete"));
+populateDatabase().then(() => console.log('Database population complete'))

@@ -1,5 +1,5 @@
-import { asc, desc, gt, lt } from "drizzle-orm";
-import type { SQLiteColumn, SQLiteSelect } from "drizzle-orm/sqlite-core";
+import { asc, desc, gt, lt } from 'drizzle-orm/expressions'
+import type { SQLiteColumn, SQLiteSelect } from 'drizzle-orm/sqlite-core'
 
 type DataTypeMap = {
 	string: string;
@@ -14,10 +14,10 @@ type DataTypeMap = {
 };
 type ConvertDataType<T extends keyof DataTypeMap> = DataTypeMap[T];
 
-type SortOrder = "asc" | "desc";
+type SortOrder = 'asc' | 'desc';
 
 type CursorConfig<T extends SQLiteColumn> = {
-	cursor: ConvertDataType<T["dataType"]>;
+	cursor?: ConvertDataType<T['dataType']>;
 	cursorColumn: T;
 	limit: number;
 	sortOrder?: SortOrder;
@@ -28,17 +28,17 @@ export const withCursorPagination = <
 	U extends SQLiteSelect,
 >(
 	query: U,
-	{ cursor, cursorColumn, limit = 20, sortOrder = "desc" }: CursorConfig<T>,
+	{ cursor, cursorColumn, limit = 20, sortOrder = 'desc' }: CursorConfig<T>,
 ) =>
 	cursor
 		? query
-				.orderBy(sortOrder === "asc" ? asc(cursorColumn) : desc(cursorColumn))
+				.orderBy(sortOrder === 'asc' ? asc(cursorColumn) : desc(cursorColumn))
 				.where(
-					sortOrder === "desc"
+					sortOrder === 'desc'
 						? lt(cursorColumn, cursor)
 						: gt(cursorColumn, cursor),
 				)
 				.limit(limit)
 		: query
-				.orderBy(sortOrder === "asc" ? asc(cursorColumn) : desc(cursorColumn))
-				.limit(limit);
+				.orderBy(sortOrder === 'asc' ? asc(cursorColumn) : desc(cursorColumn))
+				.limit(limit)
