@@ -1,19 +1,34 @@
 import { asc, desc, gt, lt } from "drizzle-orm";
 import type { SQLiteColumn, SQLiteSelect } from "drizzle-orm/sqlite-core";
 
+type DataTypeMap = {
+	string: string;
+	number: number;
+	boolean: boolean;
+	array: any[];
+	json: object;
+	date: Date;
+	bigint: bigint;
+	custom: any;
+	buffer: Buffer;
+};
+type ConvertDataType<T extends keyof DataTypeMap> = DataTypeMap[T];
+
 type SortOrder = "asc" | "desc";
 
-type CursorConfig = {
-	cursor: any;
+type CursorConfig<T extends SQLiteColumn> = {
+	cursor: ConvertDataType<T["dataType"]>;
+	cursorColumn: T;
 	limit: number;
-	cursorColumn: SQLiteColumn;
 	sortOrder?: SortOrder;
 };
 
-export const withCursorPagination = <T extends SQLiteSelect>(
-	query: T,
-	// default sort order is descending, i.e. newest first
-	{ cursor, limit = 20, cursorColumn, sortOrder = "desc" }: CursorConfig,
+export const withCursorPagination = <
+	T extends SQLiteColumn,
+	U extends SQLiteSelect,
+>(
+	query: U,
+	{ cursor, cursorColumn, limit = 20, sortOrder = "desc" }: CursorConfig<T>,
 ) =>
 	cursor
 		? query
