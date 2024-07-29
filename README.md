@@ -1,6 +1,6 @@
 # Infinitely scrolling feed with Next.js, Server Actions, Drizzle, and React Query
 
-This app primarily for experimenting with fetching data for an infinitely scrolling feed with React server actions. Inspired by [this tweet](https://x.com/rwieruch/status/1816141821413597595)
+This app primarily for experimenting with fetching data for an infinitely scrolling feed with React server actions. Inspired by [this tweet](https://x.com/rwieruch/status/1816141821413597595).
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
