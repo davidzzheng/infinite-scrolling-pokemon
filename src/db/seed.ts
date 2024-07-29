@@ -1,11 +1,5 @@
-import Database from 'better-sqlite3'
-import { drizzle } from 'drizzle-orm/better-sqlite3'
-
 import * as schema from './schema'
-
-// Initialize the database
-const sqlite = new Database('pokemon.db')
-const db = drizzle(sqlite, { schema })
+import { db } from './client'
 
 async function fetchPokemonData(id: number) {
 	const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
