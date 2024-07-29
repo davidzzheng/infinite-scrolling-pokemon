@@ -1,7 +1,7 @@
 import { defineConfig } from 'drizzle-kit'
 import { config } from 'dotenv'
 
-config({ path: '.env' })
+config()
 
 export default defineConfig({
 	schema: './src/db/schema.ts',
@@ -11,6 +11,5 @@ export default defineConfig({
 		authToken: process.env.TURSO_AUTH_TOKEN,
 	},
 	driver: 'turso',
-	verbose: true,
 	strict: true,
 })
