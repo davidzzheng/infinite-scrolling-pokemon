@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback } from 'react'
 import { usePokemonFeed } from '../state/feed'
-import { Feed } from './feed'
+import { Feed } from '../components/feed'
 
 export const HomeView = () => {
 	const { data, error, fetchNextPage, isLoading } = usePokemonFeed()
