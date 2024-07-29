@@ -1,18 +1,15 @@
-'use client'
+import { useEffect } from 'react'
 
-import { useCallback, useEffect, useMemo } from 'react'
-
-import { usePokemonFeed } from '@/src/state/feed'
 import { capitalize } from '../lib/string'
 import { useIntersectionObserver } from '../hooks/intersection-observer'
 
-export const Feed = () => {
-	const { data, error, fetchNextPage, isLoading } = usePokemonFeed()
+type FeedProps = {
+	items: any[];
+	isLoading?: boolean;
+	loadMore: () => void;
+};
 
-	const feed = useMemo(() => (data ? data.pages.flat() : []), [data])
-
-	const loadMore = useCallback(() => fetchNextPage(), [fetchNextPage])
-
+export const Feed = ({ items, isLoading, loadMore }: FeedProps) => {
 	const { elementRef, isIntersecting } = useIntersectionObserver()
 
 	useEffect(() => {
@@ -23,9 +20,8 @@ export const Feed = () => {
 
 	return (
 		<div className="flex flex-col items-center gap-y-6">
-			{error && <div>Error: {error.message}</div>}
 			<ul className="flex flex-col gap-y-6">
-				{feed.map((pokemon) => (
+				{items.map((pokemon) => (
 					<li
 						key={pokemon.id}
 						className="w-48 rounded-lg transition p-2 hover:shadow-slate-300 hover:shadow-lg"
