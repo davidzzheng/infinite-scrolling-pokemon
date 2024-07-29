@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import { usePokemonFeed } from '@/src/state/feed'
 import { capitalize } from '../lib/string'
+import { useIntersectionObserver } from '../hooks/intersection-observer'
 
 export const Feed = () => {
 	const { data, error, fetchNextPage, isLoading } = usePokemonFeed()
@@ -11,6 +12,14 @@ export const Feed = () => {
 	const feed = useMemo(() => (data ? data.pages.flat() : []), [data])
 
 	const loadMore = useCallback(() => fetchNextPage(), [fetchNextPage])
+
+	const { elementRef, isIntersecting } = useIntersectionObserver()
+
+	useEffect(() => {
+		if (isIntersecting) {
+			loadMore?.()
+		}
+	}, [isIntersecting, loadMore])
 
 	return (
 		<div className="flex flex-col items-center gap-y-6">
@@ -33,16 +42,10 @@ export const Feed = () => {
 					</li>
 				))}
 			</ul>
-			{isLoading ? (
-				<div>Loading...</div>
-			) : (
-				<button
-					onClick={loadMore}
-					className="w-full rounded-lg bg-slate-200 p-2 text-center text-lg font-medium text-slate-600 hover:bg-slate-300 transition"
-				>
-					Load More
-				</button>
-			)}
+			{/* @ts-ignore */}
+			<div ref={elementRef} className="opacity-0 h-0" />
+
+			{isLoading ? <div>Loading...</div> : null}
 		</div>
 	)
 }
