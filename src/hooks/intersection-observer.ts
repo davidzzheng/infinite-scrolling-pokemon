@@ -1,38 +1,50 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 type UseIntersectionObserverProps = {
-	threshold?: number;
 	root?: Element | null;
 	rootMargin?: string;
+	threshold?: number | number[];
+	onIntersect?: () => void;
 };
 
-export const useIntersectionObserver = ({
-	threshold = 0,
-	root = null,
-	rootMargin = '0px',
-}: UseIntersectionObserverProps = {}) => {
-	const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null)
+export const useIntersectionObserver = (
+	{ root, rootMargin, threshold, onIntersect }: UseIntersectionObserverProps = {
+		rootMargin: '100px',
+		threshold: 0.1,
+	},
+) => {
+	const elementRef = useRef(null)
+
 	const [isIntersecting, setIsIntersecting] = useState(false)
-	const elementRef = useRef<HTMLElement | null>(null)
 
-	const frozen = useRef(false)
+	const handleIntersect = useCallback(
+		(entries: IntersectionObserverEntry[]) => {
+			const [entry] = entries
+			setIsIntersecting(entry.isIntersecting)
 
-	const updateEntry = ([entry]: IntersectionObserverEntry[]): void => {
-		setEntry(entry)
-		setIsIntersecting(entry.isIntersecting)
-	}
+			if (entry.isIntersecting) {
+				onIntersect?.()
+			}
+		},
+		[onIntersect],
+	)
 
 	useEffect(() => {
-		const node = elementRef?.current
-		if (!node || frozen.current) return
+		const target = elementRef?.current
+		if (!target) return
 
-		const observerParams = { threshold, root, rootMargin }
-		const observer = new IntersectionObserver(updateEntry, observerParams)
+		const observer = new IntersectionObserver(handleIntersect, {
+			root,
+			rootMargin,
+			threshold,
+		})
 
-		observer.observe(node)
+		observer.observe(target)
 
-		return () => observer.disconnect()
-	}, [threshold, root, rootMargin])
+		return () => {
+			observer.unobserve(target)
+		}
+	}, [elementRef, root, rootMargin, threshold, handleIntersect])
 
-	return { elementRef, entry, isIntersecting, frozen }
+	return { elementRef, isIntersecting }
 }

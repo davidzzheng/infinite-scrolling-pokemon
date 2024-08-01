@@ -1,5 +1,3 @@
-import { useEffect } from 'react'
-
 import { capitalize } from '../lib/string'
 import { useIntersectionObserver } from '../hooks/intersection-observer'
 
@@ -10,13 +8,9 @@ type FeedProps = {
 };
 
 export const Feed = ({ items, isLoading, loadMore }: FeedProps) => {
-	const { elementRef, isIntersecting } = useIntersectionObserver()
-
-	useEffect(() => {
-		if (isIntersecting) {
-			loadMore?.()
-		}
-	}, [isIntersecting, loadMore])
+	const { elementRef } = useIntersectionObserver({
+		onIntersect: loadMore,
+	})
 
 	return (
 		<div className="flex flex-col items-center gap-y-6">
@@ -38,7 +32,6 @@ export const Feed = ({ items, isLoading, loadMore }: FeedProps) => {
 					</li>
 				))}
 			</ul>
-			{/* @ts-ignore */}
 			<div ref={elementRef} className="opacity-0 h-0" />
 
 			{isLoading ? <div>Loading...</div> : null}
